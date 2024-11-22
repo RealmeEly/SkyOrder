@@ -148,7 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public void startOrStop(Integer status, Long id) {
-        employeeMapper.startOrStop(status, id);
+        employeeMapper.updateStatus(status, id);
     }
 
     /**
