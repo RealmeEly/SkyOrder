@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
@@ -11,6 +12,7 @@ import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordEditFailedException;
@@ -83,14 +85,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus(StatusConstant.ENABLE);
         //设置密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        //记录创建日期和修改日期
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        //记录创建者和修改者
-        Long empId = BaseContext.getCurrentId();
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
-
         employeeMapper.insert(employee);
     }
 
@@ -104,9 +98,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateEmp(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.updateEmp(employee);
     }
@@ -148,7 +139,10 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public void startOrStop(Integer status, Long id) {
-        employeeMapper.updateStatus(status, id);
+        Employee employee = new Employee();
+        employee.setId(id);
+        employee.setStatus(status);
+        employeeMapper.updateStatus(employee);
     }
 
     /**
@@ -161,16 +155,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         Long id = BaseContext.getCurrentId();
         String oldPassword = DigestUtils.md5DigestAsHex(passwordEditDTO.getOldPassword().getBytes());
         String newPassword = DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes());
-        Employee employee = employeeMapper.getById(id);
-        if (employee == null) {
+        Employee e = employeeMapper.getById(id);
+        if (e == null) {
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
-        if (!employee.getPassword().equals(oldPassword)) {
+        if (!e.getPassword().equals(oldPassword)) {
             throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED);
         }
         if (oldPassword.equals(newPassword)) {
             throw new PasswordEditFailedException(MessageConstant.PASSWORD_IS_SAME);
         }
-        employeeMapper.editPassword(id, newPassword);
+        Employee employee = new Employee();
+        employee.setId(id);
+        employee.setPassword(newPassword);
+        employeeMapper.editPassword(employee);
     }
 }

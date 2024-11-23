@@ -1,8 +1,10 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.annotation.AutoFill;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -24,6 +26,7 @@ public interface EmployeeMapper {
      *
      * @param employee
      */
+    @AutoFill(OperationType.INSERT)
     void insert(Employee employee);
 
     /**
@@ -32,6 +35,7 @@ public interface EmployeeMapper {
      * @param employee
      * @return
      */
+    @AutoFill(OperationType.UPDATE)
     void updateEmp(Employee employee);
 
     /**
@@ -54,18 +58,18 @@ public interface EmployeeMapper {
     /**
      * 启用员工/禁用员工
      *
-     * @param status
-     * @param id
+     * @param employee
      */
-    @Update("update employee set status = #{status} where id = #{id}")
-    void updateStatus(Integer status, Long id);
+    @AutoFill(OperationType.UPDATE)
+    @Update("update employee set status = #{status}, update_time = #{updateTime}, update_user=#{updateUser} where id = #{id}")
+    void updateStatus(Employee employee);
 
     /**
      * 修改员工密码
      *
-     * @param id
-     * @param password
+     * @param employee
      */
-    @Update("update employee set password = #{password} where id = #{id}")
-    void editPassword(Long id, String password);
+    @AutoFill(OperationType.UPDATE)
+    @Update("update employee set password = #{password}, update_time = #{updateTime}, update_user=#{updateUser} where id = #{id}")
+    void editPassword(Employee employee);
 }
