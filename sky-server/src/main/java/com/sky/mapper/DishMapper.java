@@ -5,6 +5,7 @@ import com.sky.annotation.AutoFill;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -27,7 +28,7 @@ public interface DishMapper {
      * @param dishPageQueryDTO
      * @return
      */
-    Page<Dish> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+    Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 
     /**
      * 菜品分类查询
@@ -35,8 +36,8 @@ public interface DishMapper {
      * @param categoryId
      * @return
      */
-    @Select("select * from dish where category_id = #{categoryId}")
-    List<Dish> list(Long categoryId);
+    @Select("select * from dish where category_id = #{categoryId} order by create_time desc")
+    List<DishVO> list(Long categoryId);
 
     /**
      * 根据ID查询菜品
@@ -45,7 +46,7 @@ public interface DishMapper {
      * @return
      */
     @Select("select * from dish where id = #{id}")
-    Dish getById(Long id);
+    DishVO getById(Long id);
 
     /**
      * 修改菜品
@@ -77,4 +78,12 @@ public interface DishMapper {
      */
     @AutoFill(OperationType.UPDATE)
     void updateStatus(Dish dish);
+
+    /**
+     * 计数停售菜品数量
+     *
+     * @param Ids
+     * @return
+     */
+    Integer countStop(List<Long> Ids);
 }

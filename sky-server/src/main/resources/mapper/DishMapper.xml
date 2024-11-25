@@ -11,7 +11,7 @@
         </foreach>
     </delete>
 
-    <select id="pageQuery" resultType="com.sky.entity.Dish">
+    <select id="pageQuery" resultType="com.sky.vo.DishVO">
         select *
         from dish
         <where>
@@ -73,4 +73,14 @@
         values (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime},
                 #{createUser}, #{updateUser})
     </insert>
+
+    <select id="countStop" resultType="java.lang.Integer">
+        select count(*)
+        from dish
+        where status = 0
+          and id in
+        <foreach collection="Ids" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

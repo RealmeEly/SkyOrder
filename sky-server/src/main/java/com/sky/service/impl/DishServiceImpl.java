@@ -18,6 +18,7 @@ import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,9 +44,15 @@ public class DishServiceImpl implements DishService {
     @Override
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
-        Page<Dish> page = dishMapper.pageQuery(dishPageQueryDTO);
+        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
         long total = page.getTotal();
-        List<Dish> records = page.getResult();
+        List<DishVO> records = page.getResult();
+        if (records != null && !records.isEmpty()) {
+            records.forEach(record -> {
+                String categoryName = categoryMapper.getNameById(record.getCategoryId());
+                record.setCategoryName(categoryName);
+            });
+        }
         return new PageResult(total, records);
     }
 
@@ -56,8 +63,13 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     @Override
-    public List<Dish> list(Long categoryId) {
-        return dishMapper.list(categoryId);
+    public List<DishVO> list(Long categoryId) {
+        List<DishVO> dishVOs = dishMapper.list(categoryId);
+        if (dishVOs != null && !dishVOs.isEmpty()) {
+            String categoryName = categoryMapper.getNameById(categoryId);
+            dishVOs.forEach(dishVO -> dishVO.setCategoryName(categoryName));
+        }
+        return dishVOs;
     }
 
     /**
@@ -68,11 +80,9 @@ public class DishServiceImpl implements DishService {
      */
     @Override
     public DishVO getById(Long id) {
-        Dish dish = dishMapper.getById(id);
-        Category category = categoryMapper.getById(dish.getCategoryId());
+        DishVO dishVO = dishMapper.getById(id);
+        Category category = categoryMapper.getById(dishVO.getCategoryId());
         List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
-        DishVO dishVO = new DishVO();
-        BeanUtils.copyProperties(dish, dishVO);
         dishVO.setCategoryName(category.getName());
         dishVO.setFlavors(dishFlavors);
         return dishVO;
@@ -83,15 +93,16 @@ public class DishServiceImpl implements DishService {
      *
      * @param ids
      */
+    @Transactional
     @Override
     public void delete(List<Long> ids) {
         for (Long id : ids) {
-            Dish dish = dishMapper.getById(id);
-            if (dish.getStatus() == StatusConstant.ENABLE) {
+            DishVO dishVO = dishMapper.getById(id);
+            if (dishVO.getStatus() == StatusConstant.ENABLE) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         }
-        List<Long> setmealIds = setmealDishMapper.getIdsByDishIds(ids);
+        List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
         if (setmealIds != null && !setmealIds.isEmpty()) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
@@ -104,6 +115,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishDTO
      */
+    @Transactional
     @Override
     public void update(DishDTO dishDTO) {
         Dish dish = new Dish();
@@ -123,6 +135,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishDTO
      */
+    @Transactional
     @Override
     public void addDish(DishDTO dishDTO) {
         Dish dish = new Dish();
@@ -148,11 +161,11 @@ public class DishServiceImpl implements DishService {
         dish.setId(id);
         dish.setStatus(status);
         dishMapper.updateStatus(dish);
-        if (status==0) {
-            List<Long> setmealIds = setmealDishMapper.getIdsByDishId(id);
+        if (status == 0) {
+            List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishId(id);
             if (setmealIds != null && !setmealIds.isEmpty()) {
                 for (Long setmealId : setmealIds) {
-                    Setmeal setmeal =new Setmeal();
+                    Setmeal setmeal = new Setmeal();
                     setmeal.setStatus(status);
                     setmeal.setId(setmealId);
                     setmealMapper.updateStatus(setmeal);
