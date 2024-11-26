@@ -11,3 +11,8 @@ sky:
     access-key-id: LTAI5tHzX4fMjySKcCoCvYci
     access-key-secret: vPKhVa4Kux8jUP6fU4614CQ3FW0wiC
     bucket-name: cangqiongwaimaipbj
+  redis:
+    host: localhost
+    port: 6379
+    password: Inkanetoki2001
+    database: 0
