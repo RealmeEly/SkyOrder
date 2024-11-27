@@ -33,7 +33,7 @@ public interface SetmealDishMapper {
      * @return
      */
     @Select("select * from setmeal_dish where setmeal_id = #{setmealId}")
-    List<SetmealDish> getDishsBySetmealId(Long setmealId);
+    List<SetmealDish> getDishesBySetmealId(Long setmealId);
 
     /**
      * 批量新增

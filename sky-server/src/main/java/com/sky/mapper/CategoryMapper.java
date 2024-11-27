@@ -37,7 +37,6 @@ public interface CategoryMapper {
      * @param type
      * @return
      */
-    @Select("select * from category where type = #{type} order by sort, create_time desc")
     List<Category> list(Integer type);
 
     /**

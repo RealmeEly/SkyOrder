@@ -16,3 +16,6 @@ sky:
     port: 6379
     password: Inkanetoki2001
     database: 0
+  wechat:
+    appid: wxf6beae9ea0c6a259
+    secret: c8c60152aa578c992a97ff319f10c44b

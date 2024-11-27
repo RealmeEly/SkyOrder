@@ -15,13 +15,15 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
+import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -65,7 +67,7 @@ public class SetmealServiceImpl implements SetmealService {
     @Override
     public SetmealVO getById(Long id) {
         SetmealVO setmealVO = setmealMapper.getById(id);
-        List<SetmealDish> setmealDishes = setmealDishMapper.getDishsBySetmealId(id);
+        List<SetmealDish> setmealDishes = setmealDishMapper.getDishesBySetmealId(id);
         setmealVO.setSetmealDishes(setmealDishes);
         String categoryName = categoryMapper.getNameById(setmealVO.getCategoryId());
         setmealVO.setCategoryName(categoryName);
@@ -151,5 +153,38 @@ public class SetmealServiceImpl implements SetmealService {
         }
         setmealMapper.deleteBatch(ids);
         setmealDishMapper.deleteBatchBySetmealIds(ids);
+    }
+
+    /**
+     * 根据分类查询套餐
+     *
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<SetmealVO> list(Long categoryId) {
+        return setmealMapper.getByCategoryId(categoryId);
+    }
+
+    /**
+     * 获取套餐菜品信息
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<DishItemVO> getDishes(Long id) {
+        List<SetmealDish> dishes = setmealDishMapper.getDishesBySetmealId(id);
+        List<DishItemVO> dishItemVOList = new ArrayList<>();
+        if (dishes != null && !dishes.isEmpty()) {
+            dishes.forEach(dish -> {
+                DishItemVO dishItemVO = new DishItemVO();
+                BeanUtils.copyProperties(dish, dishItemVO);
+                DishVO dishVO = dishMapper.getById(dish.getDishId());
+                BeanUtils.copyProperties(dishVO, dishItemVO);
+                dishItemVOList.add(dishItemVO);
+            });
+        }
+        return dishItemVOList;
     }
 }
