@@ -24,6 +24,7 @@ public class CategoryController {
      * @param type
      * @return
      */
+    // TODO 增加缓存查询
     @GetMapping("/list")
     public Result<List<Category>> list(Integer type) {
         log.info("用户查询种类为：{}的分类", type);

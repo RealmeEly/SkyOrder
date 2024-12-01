@@ -26,6 +26,7 @@ public class SetmealController {
      * @param categoryId
      * @return
      */
+    // TODO 增加缓存查询
     @GetMapping("/list")
     public Result<List<SetmealVO>> list(Long categoryId) {
         log.info("用户查询分类ID为{}的套餐", categoryId);
@@ -39,6 +40,7 @@ public class SetmealController {
      * @param id
      * @return
      */
+    // TODO 增加缓存查询
     @GetMapping("/dish/{id}")
     public Result<List<DishItemVO>> getDishes(@PathVariable Long id) {
         log.info("获取ID为{}的套餐的菜品信息", id);
