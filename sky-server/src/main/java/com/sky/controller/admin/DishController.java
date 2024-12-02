@@ -8,6 +8,7 @@ import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,10 +69,10 @@ public class DishController {
      * @return
      */
     @DeleteMapping
+    @CacheEvict(cacheNames = "dishCache", allEntries = true)
     public Result<String> delete(@RequestParam List<Long> ids) {
         log.info("批量删除菜品，ID：{}", ids);
         dishService.delete(ids);
-        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -82,10 +83,10 @@ public class DishController {
      * @return
      */
     @PutMapping
+    @CacheEvict(cacheNames = "dish", allEntries = true)
     public Result<String> update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
         dishService.update(dishDTO);
-        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -96,10 +97,10 @@ public class DishController {
      * @return
      */
     @PostMapping
+    @CacheEvict(cacheNames = "dish", key = "#dishDTO.categoryId")
     public Result<String> addDish(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
         dishService.addDish(dishDTO);
-        cleanCache("dish_" + dishDTO.getCategoryId());
         return Result.success();
     }
 
@@ -111,19 +112,10 @@ public class DishController {
      * @return
      */
     @PostMapping("/status/{status}")
+    @CacheEvict(cacheNames = "dish", allEntries = true)
     public Result<String> startOrStop(@PathVariable Integer status, Long id) {
         log.info("{}ID为{}的菜品", status == 1 ? "启售" : "停售", id);
         dishService.startOrStop(status, id);
-        cleanCache("dish_*");
         return Result.success();
-    }
-
-    /**
-     * 清理缓存
-     *
-     * @param pattern
-     */
-    private void cleanCache(String pattern) {
-        redisTemplate.delete(redisTemplate.keys(pattern));
     }
 }

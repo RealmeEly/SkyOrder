@@ -67,7 +67,10 @@ public class DishServiceImpl implements DishService {
         List<DishVO> dishVOs = dishMapper.list(categoryId);
         if (dishVOs != null && !dishVOs.isEmpty()) {
             String categoryName = categoryMapper.getNameById(categoryId);
-            dishVOs.forEach(dishVO -> dishVO.setCategoryName(categoryName));
+            dishVOs.forEach(dishVO -> {
+                dishVO.setCategoryName(categoryName);
+                dishVO.setFlavors(dishFlavorMapper.getByDishId(dishVO.getId()));
+            });
         }
         return dishVOs;
     }

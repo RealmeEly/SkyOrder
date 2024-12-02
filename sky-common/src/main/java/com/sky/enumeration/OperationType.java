@@ -13,6 +13,10 @@ public enum OperationType {
     /**
      * 插入操作
      */
-    INSERT
+    INSERT,
 
+    /**
+     * 用户插入操作
+     */
+    USER_INSERT
 }

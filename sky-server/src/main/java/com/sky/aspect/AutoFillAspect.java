@@ -54,19 +54,33 @@ public class AutoFillAspect {
             try {
                 Method setCreateTime = entity.getClass().getMethod("setCreateTime", LocalDateTime.class);
                 Method setCreateUser = entity.getClass().getMethod("setCreateUser", Long.class);
+                Method setUpdateTime = entity.getClass().getMethod("setUpdateTime", LocalDateTime.class);
+                Method setUpdateUser = entity.getClass().getMethod("setUpdateUser", Long.class);
                 setCreateTime.invoke(entity, now);
                 setCreateUser.invoke(entity, currentId);
+                setUpdateTime.invoke(entity, now);
+                setUpdateUser.invoke(entity, currentId);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }
-        try {
-            Method setUpdateTime = entity.getClass().getMethod("setUpdateTime", LocalDateTime.class);
-            Method setUpdateUser = entity.getClass().getMethod("setUpdateUser", Long.class);
-            setUpdateTime.invoke(entity, now);
-            setUpdateUser.invoke(entity, currentId);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } else if (operationType == OperationType.UPDATE) {
+            try {
+                Method setUpdateTime = entity.getClass().getMethod("setUpdateTime", LocalDateTime.class);
+                Method setUpdateUser = entity.getClass().getMethod("setUpdateUser", Long.class);
+                setUpdateTime.invoke(entity, now);
+                setUpdateUser.invoke(entity, currentId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else if (operationType == OperationType.USER_INSERT) {
+            try {
+                Method setCreateTime = entity.getClass().getMethod("setCreateTime", LocalDateTime.class);
+                Method setUserId = entity.getClass().getMethod("setUserId", Long.class);
+                setCreateTime.invoke(entity, now);
+                setUserId.invoke(entity, currentId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

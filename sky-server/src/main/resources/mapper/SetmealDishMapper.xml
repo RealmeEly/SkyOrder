@@ -11,7 +11,7 @@
         </foreach>
     </select>
 
-    <insert id="insertBatch">
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
         insert into setmeal_dish (setmeal_id, dish_id, name, price, copies)
         values
         <foreach collection="setmealDishes" separator="," item="setmealDishe">
