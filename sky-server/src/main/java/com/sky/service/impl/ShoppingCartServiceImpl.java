@@ -12,6 +12,7 @@ import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      *
      * @param shoppingCartDTO
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void add(ShoppingCartDTO shoppingCartDTO) {
         Long dishId = shoppingCartDTO.getDishId();
@@ -79,6 +81,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      *
      * @param shoppingCartDTO
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void sub(ShoppingCartDTO shoppingCartDTO) {
         Long dishId = shoppingCartDTO.getDishId();
@@ -103,6 +106,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     /**
      * 清空购物车
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void clean() {
         Long userId = BaseContext.getCurrentId();

@@ -96,7 +96,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param ids
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(List<Long> ids) {
         for (Long id : ids) {
@@ -118,7 +118,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishDTO
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(DishDTO dishDTO) {
         Dish dish = new Dish();
@@ -138,7 +138,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishDTO
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void addDish(DishDTO dishDTO) {
         Dish dish = new Dish();
@@ -158,6 +158,7 @@ public class DishServiceImpl implements DishService {
      * @param status
      * @param id
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void startOrStop(Integer status, Long id) {
         Dish dish = new Dish();

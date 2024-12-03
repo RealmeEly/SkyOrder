@@ -83,6 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
      *
      * @param categoryDTO
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateCategory(CategoryDTO categoryDTO) {
         Category category = new Category();
@@ -96,6 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @param status
      * @param id
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void startOrStop(Integer status, Long id) {
         Category category=new Category();
@@ -109,6 +111,7 @@ public class CategoryServiceImpl implements CategoryService {
      *
      * @param categoryDTO
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void addCategory(CategoryDTO categoryDTO) {
         Category category = new Category();

@@ -79,7 +79,7 @@ public class SetmealServiceImpl implements SetmealService {
      *
      * @param setmealDTO
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void addSetmeal(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
@@ -99,6 +99,7 @@ public class SetmealServiceImpl implements SetmealService {
      * @param status
      * @param id
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void startOrStop(Integer status, Long id) {
         Setmeal setmeal = new Setmeal();
@@ -122,7 +123,7 @@ public class SetmealServiceImpl implements SetmealService {
      *
      * @param setmealDTO
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
@@ -142,7 +143,7 @@ public class SetmealServiceImpl implements SetmealService {
      *
      * @param ids
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(List<Long> ids) {
         for (Long id : ids) {

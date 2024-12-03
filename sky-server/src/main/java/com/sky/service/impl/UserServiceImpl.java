@@ -12,6 +12,7 @@ import com.sky.service.UserService;
 import com.sky.utils.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
      * @param userLoginDTO
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public User wxLogin(UserLoginDTO userLoginDTO) {
         String openId = getOpenId(userLoginDTO.getCode());
