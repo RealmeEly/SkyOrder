@@ -21,6 +21,9 @@ public class OrderOverViewVO implements Serializable {
     //待派送数量
     private Integer deliveredOrders;
 
+    //派送中数量
+    private Integer deliveryInProgress;
+
     //已完成数量
     private Integer completedOrders;
 
