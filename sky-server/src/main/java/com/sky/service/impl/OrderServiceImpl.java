@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -14,6 +15,7 @@ import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.vo.*;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +40,8 @@ public class OrderServiceImpl implements OrderService {
     private AddressBookMapper addressBookMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -86,8 +92,8 @@ public class OrderServiceImpl implements OrderService {
         //清理购物车中的数据
         shoppingCartMapper.clean(userId);
         //封装返回结果
-        return OrderSubmitVO.builder().id(order.getId()).orderNumber(order.getNumber())
-                .orderAmount(order.getAmount()).orderTime(order.getOrderTime()).build();
+        return OrderSubmitVO.builder().id(order.getId()).orderNumber(order.getNumber()).orderAmount(order.getAmount())
+                .orderTime(order.getOrderTime()).build();
     }
 
     /**
@@ -138,14 +144,17 @@ public class OrderServiceImpl implements OrderService {
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
 
         // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
-        Orders orders = Orders.builder()
-                .id(ordersDB.getId())
-                .status(Orders.TO_BE_CONFIRMED)
-                .payStatus(Orders.PAID)
-                .checkoutTime(LocalDateTime.now())
-                .build();
+        Orders orders = Orders.builder().id(ordersDB.getId()).status(Orders.TO_BE_CONFIRMED).payStatus(Orders.PAID)
+                .checkoutTime(LocalDateTime.now()).build();
 
         orderMapper.update(orders);
+
+        //来单提醒
+        Map map = new HashMap<>();
+        map.put("type", 1); //消息类型，1表示来单提醒
+        map.put("orderId", orders.getId());
+        map.put("content", "订单号：" + outTradeNo);
+        webSocketServer.send2AllClient(JSON.toJSONString(map));
     }
 
     /**
@@ -379,5 +388,23 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveryTime(LocalDateTime.now());
         order.setStatus(Orders.COMPLETED);
         orderMapper.update(order);
+    }
+
+    /**
+     * 用户催单
+     *
+     * @param id
+     */
+    @Override
+    public void reminder(Long id) {
+        Orders order = orderMapper.getById(id);
+        if (order == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        Map map = new HashMap<>();
+        map.put("type", 1); //消息类型，2表示用户催单
+        map.put("orderId", order.getId());
+        map.put("content", "订单号：" + order.getNumber());
+        webSocketServer.send2AllClient(JSON.toJSONString(map));
     }
 }
