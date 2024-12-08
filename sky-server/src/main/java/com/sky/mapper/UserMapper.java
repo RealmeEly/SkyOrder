@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface UserMapper {
     /**
@@ -31,4 +33,13 @@ public interface UserMapper {
      */
     @Select("select * from user where id = #{id}")
     User getById(Long id);
+
+    /**
+     * 根据创建时间统计
+     *
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    Long countByCreateTime(LocalDateTime beginTime, LocalDateTime endTime);
 }
