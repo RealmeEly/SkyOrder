@@ -86,4 +86,13 @@ public interface DishMapper {
      * @return
      */
     Integer countStop(List<Long> Ids);
+
+    /**
+     * 根据售卖状态统计
+     *
+     * @param status
+     * @return
+     */
+    @Select("select count(*) from dish where status = #{status}")
+    Integer countByStatus(Integer status);
 }

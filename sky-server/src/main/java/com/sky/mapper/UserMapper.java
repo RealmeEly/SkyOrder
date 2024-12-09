@@ -41,5 +41,5 @@ public interface UserMapper {
      * @param endTime
      * @return
      */
-    Long countByCreateTime(LocalDateTime beginTime, LocalDateTime endTime);
+    Integer countByCreateTime(LocalDateTime beginTime, LocalDateTime endTime);
 }
